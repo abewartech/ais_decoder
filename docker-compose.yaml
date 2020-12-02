@@ -12,6 +12,6 @@ services:
       env_file:
         - .env  #This both the docker-compose env file (to set ports names, image tags etc) and the internal container config (handles passwords, ports to connect to etc.)
       volumes:
-        #  - /etc/localtime:/etc/localtime:ro #This is useful in Linux, doesn't work on Windows. 
-        - ${DATA_FILE_DIR}:${CONTAINER_FILE_DIR}
+         - /etc/localtime:/etc/localtime:ro #This is useful in Linux, doesn't work on Windows. 
+        #- ${DATA_FILE_DIR}:${CONTAINER_FILE_DIR}
       command: python /usr/local/file_streamer/main.py  -ll 'INFO' 
