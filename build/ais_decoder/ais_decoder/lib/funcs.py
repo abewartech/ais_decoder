@@ -31,11 +31,11 @@ def read_env_vars():
     #Project
     CFG['project_name'] = os.getenv('PROJECT_NAME')
     # Source
-    CFG['src_rabbit_port'] = os.getenv('SRC_RABBIT_HOST')
-    CFG['src_rabbit_user'] = os.getenv('SRC_RABBIT_MSG_PORT')
-    CFG['src_rabbit_pw'] = os.getenv('SRC_RABBITMQ_DEFAULT_USER')
-    CFG['src_rabbit_host'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
-    CFG['src_routing_key'] = os.getenv('SRC_RABBIT_EXCHANGE')
+    CFG['src_rabbit_port'] = os.getenv('SRC_RABBIT_MSG_PORT')
+    CFG['src_rabbit_user'] = os.getenv('SRC_RABBITMQ_DEFAULT_USER')
+    CFG['src_rabbit_pw'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
+    CFG['src_rabbit_host'] = os.getenv('SRC_RABBIT_HOST')
+    CFG['src_routing_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')
     CFG['src_file_sleep'] = os.getenv('SRC_KEYS')
     CFG['src_'] = os.getenv('SRC_QUEUE')
     CFG['src_'] = os.getenv('QUEUE_MAX_LENGTH')
@@ -46,11 +46,7 @@ def read_env_vars():
     CFG['snk_rabbit_port'] = os.getenv('SRC_RABBIT_MSG_PORT')
     CFG['snk_rabbit_user'] = os.getenv('SRC_RABBITMQ_DEFAULT_USER')
     CFG['snk_rabbit_pass'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
-    CFG['snk_rabbit_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')
-    CFG['snk_'] = os.getenv('SRC_KEYS')
-    CFG['snk_'] = os.getenv('SRC_QUEUE')
-    CFG['snk_'] = os.getenv('QUEUE_MAX_LENGTH')
-    CFG['snk_'] = os.getenv('ON_ERROR_DROP_MSGS')
+    CFG['snk_rabbit_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')  
 
     log.info('Config: {0}'.format(CFG))
     return CFG
