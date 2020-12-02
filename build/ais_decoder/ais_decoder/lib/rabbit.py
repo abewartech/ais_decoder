@@ -32,7 +32,7 @@ class Rabbit_Consumer(object):
         self.cfg = CFG 
 
         user = CFG.get('src_rabbit_user')
-        password = CFG.get('src_rabbit_pass')
+        password = CFG.get('src_rabbit_pw')
         host = CFG.get('src_rabbit_host')
         port = CFG.get('src_rabbit_port')
         exchange_name= CFG.get('src_rabbit_exch')
