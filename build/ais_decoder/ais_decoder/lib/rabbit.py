@@ -42,7 +42,7 @@ class Rabbit_Consumer(object):
         log.debug('Source Rabbit is at {0}'.format(self.rabbit_url))
         self.topic_exchange = Exchange(exchange_name, type="topic")
         self.conn = Connection(self.rabbit_url) 
-        log.info('Creating Test Queue')
+        log.info('Creating Source Test Queue')
         self.create_test_queue()
         log.info('Done')
 
@@ -54,9 +54,9 @@ class Rabbit_Consumer(object):
     def create_test_queue(self):
         test_q_name = "AAA-{0}-test-consume".format(self.cfg['project_name'])
         queue = Queue(name=test_q_name, 
-                        exchange=self.sink_topic_exchange,
+                        exchange=self.topic_exchange,
                         max_length = 1000, 
-                        routing_key=os.getenv('SOURCE_RKEY'))
+                        routing_key=os.getenv('PRODUCE_KEY'))
         queue.maybe_bind(self.conn)
         queue.declare()
         return
@@ -88,7 +88,7 @@ class Rabbit_Producer(object):
                               channel=self.conn,
                               serializer ='json')
         log.info('Rabbit Wrapper initialised.')
-        log.info('Creating Test Queue')
+        log.info('Creating Sink Test Queue')
         self.create_test_queue()
         log.info('Done')
 
