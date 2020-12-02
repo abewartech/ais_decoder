@@ -27,16 +27,31 @@ def read_env_vars():
     '''
     log.debug('Reading environment variables...')
     CFG = {}
-    CFG['rabbit_port'] = os.getenv('RABBIT_MSG_PORT')
-    CFG['rabbit_user'] = os.getenv('RABBITMQ_DEFAULT_USER')
-    CFG['rabbit_pw'] = os.getenv('RABBITMQ_DEFAULT_PASS')
-    CFG['rabbit_host'] = os.getenv('RABBIT_HOST')
-    CFG['routing_key'] = os.getenv('SOURCE_RKEY')
-    CFG['file_sleep'] = os.getenv('WAIT_BETWEEN_FILES')
-    CFG['file_folder'] = os.getenv('CONTAINER_FILE_DIR')
-    CFG['exchange'] = os.getenv('RABBIT_EXCHANGE')
-    CFG['topic'] = os.getenv('RABBIT_TOPIC')
-    # CFG[''] = os.getenv('')
+
+    #Project
+    CFG['project_name'] = os.getenv('PROJECT_NAME')
+    # Source
+    CFG['src_rabbit_port'] = os.getenv('SRC_RABBIT_HOST')
+    CFG['src_rabbit_user'] = os.getenv('SRC_RABBIT_MSG_PORT')
+    CFG['src_rabbit_pw'] = os.getenv('SRC_RABBITMQ_DEFAULT_USER')
+    CFG['src_rabbit_host'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
+    CFG['src_routing_key'] = os.getenv('SRC_RABBIT_EXCHANGE')
+    CFG['src_file_sleep'] = os.getenv('SRC_KEYS')
+    CFG['src_'] = os.getenv('SRC_QUEUE')
+    CFG['src_'] = os.getenv('QUEUE_MAX_LENGTH')
+    CFG['src_'] = os.getenv('ON_ERROR_DROP_MSGS')
+
+    #Sink
+    CFG['snk_rabbit_host'] = os.getenv('SRC_RABBIT_HOST')
+    CFG['snk_rabbit_port'] = os.getenv('SRC_RABBIT_MSG_PORT')
+    CFG['snk_rabbit_user'] = os.getenv('SRC_RABBITMQ_DEFAULT_USER')
+    CFG['snk_rabbit_pass'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
+    CFG['snk_rabbit_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')
+    CFG['snk_'] = os.getenv('SRC_KEYS')
+    CFG['snk_'] = os.getenv('SRC_QUEUE')
+    CFG['snk_'] = os.getenv('QUEUE_MAX_LENGTH')
+    CFG['snk_'] = os.getenv('ON_ERROR_DROP_MSGS')
+
     log.info('Config: {0}'.format(CFG))
     return CFG
  
