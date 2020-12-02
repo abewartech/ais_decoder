@@ -26,10 +26,7 @@ class AIS_Worker(object):
         '''
         Setup all the Rabbit stuff and then init the AIS decoder
         '''
-        self.cfg = cfg_object
-        log.debug('Setting up rabbitmq connections...')
-        self.rabbit = lib.funcs.Rabbit_Wrapper(cfg_object)
-        
+        self.cfg = cfg_object  
 
     def eta_from_multi(self, decoded_dict, event_time):
         # Turn the ETA items in Voyage reports into a datetime object
