@@ -74,7 +74,7 @@ class Rabbit_Wrapper(object, CFG):
         log.debug('Rabbit is at {0}'.format(self.rabbit_url))
         self.sink_topic_exchange = Exchange(sink_topic_exchange_name, type="topic")
         self.conn = Connection(self.rabbit_url)
-        self.consume = Consumer(self.queue, callbacks=[self.on_message], accept=['json']
+        self.consume = Consumer(self.queue, callbacks=[self.on_message], accept=['json'])
         self.sink = Producer(exchange=self.sink_topic_exchange,
                               channel=self.conn,
                               serializer ='json')
