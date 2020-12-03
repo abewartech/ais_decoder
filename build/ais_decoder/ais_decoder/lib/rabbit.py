@@ -60,9 +60,7 @@ class Rabbit_Consumer(ConsumerMixin):
             self.message_handler(message)
         except Exception as err:
                 log.error('Error in message consumer: {0}'.format(err))
-        
-        
-    
+     
     def bind_to_keys(self):
         # takes the list of routing keys in the config file
         # and create a queue bound to them.
