@@ -190,10 +190,31 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
     def message_processor(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
-        body = message.body
+        body = cast_msg(message.body)
         log.info('Message :' + str(body))
         msg_dict = json.loads(body)
+        log.info('JSON Message :' + str(msg_dict))
         return msg_dict
+
+
+    def cast_msg(self,body):
+        if type(body) is str:
+            json_body = [json.loads(body)]
+        elif type(body) is dict:
+            json_body = [body]
+        elif type(body) is list:
+            json_body = body
+        elif body is None:
+            json_body = [None]
+            return
+        else:
+            log.warning('Unknown message type: %s > %s', type(body), body)
+
+        assert(type(json_body) is list)
+
+        return json_body
+
+
 
     def on_message(self, message):
         log.info('Msg type %s received: %s',type(message.body),message.body)
@@ -208,7 +229,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             producer(result, routing_key=os.getenv('PRODUCE_KEY'))
 
         except Exception as err:
-                log.error('Error in message consumer: {0}'.format(err))
+                log.error('Error in message processor: {0}'.format(err))
 
 
     def bind_to_keys(self):
