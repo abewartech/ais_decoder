@@ -36,9 +36,10 @@ def do_work():
     # producer = lib.rabbit.Rabbit_Producer()  # This pushes decoded messages to RMQ
     # decoder  = lib.ais_decoder.AIS_Worker()  # This decodes em. 
 
-    time.sleep(10)
+    time.sleep(2)
     with Connection(consumer.rabbit_url, heartbeat=20) as conn:
         # consumer_worker = consumer(conn, consumer.queues)
+        consumer.connection = conn
         log.info('Waiting for incoming messges...')
         consumer.run()
  
