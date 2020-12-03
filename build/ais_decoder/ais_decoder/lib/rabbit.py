@@ -90,7 +90,7 @@ class Rabbit_Consumer(ConsumerMixin):
  
     def create_test_queue(self):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
-        test_q_name = "AAA-{0}-test-consume".format(self.cfg['project_name'])
+        test_q_name = "AAA-{0}-test-consume".format(os.getenv('PROJECT_NAME'))
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
                         max_length = 1000, 
