@@ -36,7 +36,7 @@ def read_env_vars():
     CFG['src_rabbit_pw'] = os.getenv('SRC_RABBITMQ_DEFAULT_PASS')
     CFG['src_rabbit_host'] = os.getenv('SRC_RABBIT_HOST')
     CFG['src_routing_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')
-    CFG['src_file_sleep'] = os.getenv('SRC_KEYS')
+    CFG['src_keys'] = os.getenv('SRC_KEYS')
     CFG['src_'] = os.getenv('SRC_QUEUE')
     CFG['src_'] = os.getenv('QUEUE_MAX_LENGTH')
     CFG['src_'] = os.getenv('ON_ERROR_DROP_MSGS')

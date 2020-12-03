@@ -15,43 +15,82 @@ import datetime
 import pytz
  
 from kombu import Connection, Exchange, Producer, Queue, Consumer, binding
+from kombu.mixins import ConsumerMixin
 
-
-log = logging.getLogger('main.lib.rabbit') 
- 
-class Rabbit_Consumer(object):
+log = logging.getLogger('main.lib.rabbit')  
+class Rabbit_Consumer(ConsumerMixin):
     '''
     Take each message and do something with it.
     Send the decoded messages to a rabbit broker
     '''
-    def __init__(self, CFG):
+    def __init__(self, message_handler):
         '''
-        setup all the goodies
+        Initialise the connection to the RMQ server and use the message_handler to 
+        process incoming messages. 
+
+        In most cases the message_handler will be the decoder but it could also
+        be a filter, neural net, anomoly detector or what not.
+
+        The message handler must accept kombu message object
         '''
-        log.debug('Setting up RabbitMQ source interface...')
+        log.info('Setting up RabbitMQ source interface...')
         self.cfg = CFG 
 
-        user = CFG.get('src_rabbit_user')
-        password = CFG.get('src_rabbit_pw')
-        host = CFG.get('src_rabbit_host')
-        port = CFG.get('src_rabbit_port')
-        exchange_name= CFG.get('src_rabbit_exch')
-
         # Key to consume from:
-        self.rabbit_url = "amqp://{0}:{1}@{2}:{3}/".format(user, password, host, port)
+        self.rabbit_url = "amqp://{0}:{1}@{2}:{3}/".format(os.getenv('SRC_RABBITMQ_DEFAULT_USER'),
+                                                            os.getenv('SRC_RABBITMQ_DEFAULT_PASS'),
+                                                            os.getenv('SRC_RABBIT_HOST'),
+                                                            os.getenv('SRC_RABBIT_MSG_PORT'))
         log.debug('Source Rabbit is at {0}'.format(self.rabbit_url))
-        self.topic_exchange = Exchange(exchange_name, type="topic")
+        self.topic_exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
         self.conn = Connection(self.rabbit_url) 
-        log.info('Creating Source Test Queue')
+
+        log.debug('Creating Source Test Queue')  
         self.create_test_queue()
-        log.info('Done')
+
+        self.message_handler = message_handler
+        
+    def on_message(self, body, message):
+        log.debug('Msg type %s received: %s',type(body),body)
+        if message.delivery_info['redelivered']:
+            message.reject()
+            return
+        else:
+            message.ack()
+            
+       self.message_handler(message)
+       
+        except Exception as err:
+                log.error('Error in message consumer: {0}'.format(err))
+        
+        
+    
+    def bind_to_keys(self):
+        # takes the list of routing keys in the config file
+        # and create a queue bound to them.
+        keys = json.loads(os.getenv('SRC_KEYS')))
+        for key in keys:
+            log.info('Building queue for topic: %s',key)
+            # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
+            topic_bind = binding(exchange, routing_key=key)
+            topic_binds.append(topic_bind)
+        queue_name = os.getenv('INSERT_QUEUE')
+        self.queues = Queue(name=queue_name,
+                        exchange=exchange,
+                        bindings=topic_binds,
+                        max_length = 10000000)
+
+        log.info('Source queues: %s',queues)
+        return
 
     def errback(self, exc, interval):
-        log.warning('Produce error: %r', exc)
+        log.warning('Consumer error: %r', exc)
         log.warning('Retry in %s +1  seconds.', interval)
         time.sleep(float(interval)+1)
+        return
  
     def create_test_queue(self):
+        # Create a dummy queue on the rabbitmq server. Useful for debugging
         test_q_name = "AAA-{0}-test-consume".format(self.cfg['project_name'])
         queue = Queue(name=test_q_name, 
                         exchange=self.topic_exchange,

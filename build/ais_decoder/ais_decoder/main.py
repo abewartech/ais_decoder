@@ -21,18 +21,24 @@ import lib.ais_decoder
 log = logging.getLogger('main')
 # log.setLevel('DEBUG')
 
-def do_work(CFG):  
+def dummy_handler(message):
+    print(message)
+    return
+
+def do_work():  
     '''
     Message worker: consume > decode > publish.
     '''
     log.info('Getting ready to do work...')
-    consumer = lib.rabbit.Rabbit_Consumer(CFG)
-    producer = lib.rabbit.Rabbit_Producer(CFG)
-    decoder  = lib.ais_decoder.AIS_Worker(CFG)
+
+    decoder = dummy_handler
+    consumer = lib.rabbit.Rabbit_Consumer(decoder)  # This pulls encoded messages from RMQ and hands then to the decoder
+    # producer = lib.rabbit.Rabbit_Producer()  # This pushes decoded messages to RMQ
+    # decoder  = lib.ais_decoder.AIS_Worker()  # This decodes em. 
 
     time.sleep(10)
     with Connection(consumer.rabbit_url, heartbeat=20) as conn:
-        consumer_worker = consumer.Worker(conn, queues)
+        consumer_worker = consumer(conn, consumer.queues)
         consumer_worker.run()
  
     log.info('Worker shutdown...')
@@ -50,8 +56,8 @@ def main(args):
 
     log.setLevel(getattr(logging, args.loglevel))
     log.info('ARGS: {0}'.format(ARGS))
-    cfg_object = lib.funcs.read_env_vars() 
-    do_work(cfg_object)
+    cfg_object = lib.funcs.read_env_vars()
+    do_work()
     log.warning('Script Ended...') 
 
 if __name__ == "__main__":
