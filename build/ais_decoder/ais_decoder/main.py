@@ -40,7 +40,7 @@ def do_work():
     with Connection(consumer.rabbit_url, heartbeat=20) as conn:
         # consumer_worker = consumer(conn, consumer.queues)
         log.info('Waiting for incoming messges...')
-        consumer_worker.run()
+        consumer.run()
  
     log.info('Worker shutdown...')
 
