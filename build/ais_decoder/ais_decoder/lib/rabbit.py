@@ -50,7 +50,7 @@ class Rabbit_Consumer(ConsumerMixin):
         log.info('Consumer init complete')  
         
     def on_message(self, body, message):
-        log.debug('Msg type %s received: %s',type(body),body)
+        log.info('Msg type %s received: %s',type(body),body)
         if message.delivery_info['redelivered']:
             message.reject()
             return

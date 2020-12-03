@@ -23,7 +23,8 @@ log = logging.getLogger('main')
 # log.setLevel('DEBUG')
 
 def dummy_handler(message):
-    print(message)
+    log.warning('Beep')
+    log.warning(str(message))
     return
 
 def do_work():  
