@@ -222,7 +222,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
             topic_bind = binding(self.exchange, routing_key=key)
             topic_binds.append(topic_bind)
-        queue_name = os.getenv('INSERT_QUEUE')
+        queue_name = os.getenv('SRC_QUEUE')
         self.queue = Queue(name=queue_name,
                         exchange=self.exchange,
                         bindings=topic_binds,
@@ -240,11 +240,21 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
     def create_test_queue(self):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
         log.info('Creating Source Test Queue')  
-        test_q_name = "AAA-{0}-test-consume".format(os.getenv('PROJECT_NAME'))
+        test_q_name = "AAA-{0}-test-source".format(os.getenv('PROJECT_NAME'))
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
-                        max_length = 1000, 
+                        max_length = 100, 
+                        routing_key=os.getenv('SRC_KEYS'))
+        queue.maybe_bind(self.connection)
+        queue.declare()
+
+        log.info('Creating Sink Test Queue')  
+        test_q_name = "AAA-{0}-test-sink".format(os.getenv('PROJECT_NAME'))
+        queue = Queue(name=test_q_name, 
+                        exchange=self.exchange,
+                        max_length = 100, 
                         routing_key=os.getenv('PRODUCE_KEY'))
         queue.maybe_bind(self.connection)
         queue.declare()
+
         return
