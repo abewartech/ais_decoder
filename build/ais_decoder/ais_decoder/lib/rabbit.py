@@ -206,18 +206,6 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         except Exception as err:
                 log.error('Error in message consumer: {0}'.format(err))
 
-        log.info('Msg type %s received: %s',type(body),body)
-        if message.delivery_info['redelivered']:
-            message.reject()
-            return
-        else:
-            message.ack()
-        try:            
-            self.message_handler(message)
-        except Exception as err:
-                log.error('Error in message consumer: {0}'.format(err))
-
-
 
     def bind_to_keys(self):
         # takes the list of routing keys in the config file
