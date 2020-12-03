@@ -100,6 +100,11 @@ class Rabbit_Consumer(ConsumerMixin):
         queue.maybe_bind(self.conn)
         queue.declare()
         return
+
+    def get_consumers(self, Consumer, channel):
+        return [
+            Consumer(self.queue, callbacks=[self.on_message], accept=['json']),
+        ]
  
 class Rabbit_Producer(object):
     '''
