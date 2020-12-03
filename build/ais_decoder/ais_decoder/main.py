@@ -38,7 +38,9 @@ def do_work():
 
     time.sleep(10)
     with Connection(consumer.rabbit_url, heartbeat=20) as conn:
+        log.info('Setting up consumer connection...')
         consumer_worker = consumer(conn, consumer.queues)
+        log.info('Waiting for incoming messges...')
         consumer_worker.run()
  
     log.info('Worker shutdown...')

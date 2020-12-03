@@ -42,12 +42,10 @@ class Rabbit_Consumer(ConsumerMixin):
                                                             os.getenv('SRC_RABBIT_MSG_PORT'))
         log.debug('Source Rabbit is at {0}'.format(self.rabbit_url))
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
-        self.conn = Connection(self.rabbit_url) 
-
-        log.debug('Creating Source Test Queue')  
+        self.bind_to_keys()
         self.create_test_queue()
-
         self.message_handler = message_handler
+        log.debug('Consumer init complete')  
         
     def on_message(self, body, message):
         log.debug('Msg type %s received: %s',type(body),body)
@@ -66,10 +64,11 @@ class Rabbit_Consumer(ConsumerMixin):
     def bind_to_keys(self):
         # takes the list of routing keys in the config file
         # and create a queue bound to them.
+        log.info('Creating queue and binding keys')
         topic_binds = []
         keys = json.loads(os.getenv('SRC_KEYS'))
         for key in keys:
-            log.info('Building queue for topic: %s',key)
+            log.info('    -Key: %s',key)
             # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
             topic_bind = binding(self.exchange, routing_key=key)
             topic_binds.append(topic_bind)
@@ -79,7 +78,7 @@ class Rabbit_Consumer(ConsumerMixin):
                         bindings=topic_binds,
                         max_length = 10000000)
 
-        log.info('Source queues: %s',queues)
+        log.info('Source queues: %s',self.queues)
         return
 
     def errback(self, exc, interval):
@@ -90,6 +89,7 @@ class Rabbit_Consumer(ConsumerMixin):
  
     def create_test_queue(self):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
+        log.debug('Creating Source Test Queue')  
         test_q_name = "AAA-{0}-test-consume".format(os.getenv('PROJECT_NAME'))
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
