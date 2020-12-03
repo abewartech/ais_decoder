@@ -47,7 +47,7 @@ class Rabbit_Consumer(ConsumerMixin):
         self.create_test_queue()
         
         self.message_handler = message_handler
-        log.debug('Consumer init complete')  
+        log.info('Consumer init complete')  
         
     def on_message(self, body, message):
         log.debug('Msg type %s received: %s',type(body),body)
@@ -91,7 +91,7 @@ class Rabbit_Consumer(ConsumerMixin):
  
     def create_test_queue(self):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
-        log.debug('Creating Source Test Queue')  
+        log.info('Creating Source Test Queue')  
         test_q_name = "AAA-{0}-test-consume".format(os.getenv('PROJECT_NAME'))
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
