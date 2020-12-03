@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+    #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct 24 15:05:19 2017
@@ -21,30 +21,26 @@ import lib.ais_decoder
 
 log = logging.getLogger('main')
 # log.setLevel('DEBUG')
-
-def dummy_handler(message):
-    log.warning('Beep')
-    log.warning(str(message))
-    return
-
+ 
+     
+ 
 def do_work():  
     '''
     Message worker: consume > decode > publish.
     '''
     log.info('Getting ready to do work...')
 
-    decoder = dummy_handler
-    consumer = lib.rabbit.Rabbit_Consumer(decoder)  # This pulls encoded messages from RMQ and hands then to the decoder
-    # producer = lib.rabbit.Rabbit_Producer()  # This pushes decoded messages to RMQ
-    # decoder  = lib.ais_decoder.AIS_Worker()  # This decodes em. 
+    # This pulls/pushes messages from RMQ
+    rabbit_interface = lib.rabbit.Rabbit_ConsumerProducer()         
+
+    # This decodes messages and is used to overload the default function in the Consumer/Producer
 
     time.sleep(2)
-    with Connection(consumer.rabbit_url, heartbeat=20) as conn:
-        # consumer_worker = consumer(conn, consumer.queues)
-        consumer.connection = conn
+    with Connection(rabbit_interface.rabbit_url, heartbeat=20) as conn: 
+        rabbit_interface.connection = conn
         log.info('Waiting for incoming messges...')
-        consumer.run()
- 
+        rabbit_interface.run()  # calls dummy_handler.on_message(message)
+  
     log.info('Worker shutdown...')
 
 def main(args):
