@@ -192,7 +192,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         # This function is meant to be overloaded to provide some kind of functionality
         body = message.body
         log.info('Message :' + str(body))
-        msg_dict = body
+        msg_dict = json.loads(body)
         return msg_dict
 
     def on_message(self, message):
