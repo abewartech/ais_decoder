@@ -175,6 +175,11 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
         self.create_test_queue()
+        self.sink = Producer(exchange=self.exchange,
+                              channel=self.connection,
+                              serializer ='json',
+                              retry=True)
+
         log.info('ConsumerProducer init complete')  
  
 
@@ -197,12 +202,9 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             message.ack()
         try:            
             result = self.message_processor(message)
-            self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
-            self.producer.publish(result,
-                                exchange=os.getenv('SNK_RABBIT_EXCHANGE'), 
-                                routing_key=os.getenv('PRODUCE_KEY'), 
-                                serializer='json',
-                                retry=True)
+            producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
+            producer(payload, routing_key=payload_routing_key)
+            
         except Exception as err:
                 log.error('Error in message consumer: {0}'.format(err))
 
