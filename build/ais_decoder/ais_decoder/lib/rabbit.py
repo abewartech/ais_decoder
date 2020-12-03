@@ -57,9 +57,8 @@ class Rabbit_Consumer(ConsumerMixin):
             return
         else:
             message.ack()
-            
-       self.message_handler(message)
-       
+        try:            
+            self.message_handler(message)
         except Exception as err:
                 log.error('Error in message consumer: {0}'.format(err))
         
