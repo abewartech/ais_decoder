@@ -177,8 +177,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         self.create_test_queue()
         self.sink = Producer(exchange=self.exchange,
                               channel=self.connection,
-                              serializer ='json',
-                              retry=True)
+                              serializer ='json' )
 
         log.info('ConsumerProducer init complete')  
  
@@ -203,8 +202,8 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         try:            
             result = self.message_processor(message)
             producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
-            producer(payload, routing_key=payload_routing_key)
-            
+            producer(result, routing_key=os.getenv('PRODUCE_KEY'))
+
         except Exception as err:
                 log.error('Error in message consumer: {0}'.format(err))
 
