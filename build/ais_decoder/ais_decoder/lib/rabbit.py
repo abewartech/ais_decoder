@@ -67,7 +67,7 @@ class Rabbit_Consumer(ConsumerMixin):
     def bind_to_keys(self):
         # takes the list of routing keys in the config file
         # and create a queue bound to them.
-        keys = json.loads(os.getenv('SRC_KEYS')))
+        keys = json.loads(os.getenv('SRC_KEYS'))
         for key in keys:
             log.info('Building queue for topic: %s',key)
             # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
