@@ -190,10 +190,8 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
     def message_processor(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
-        body = cast_msg(message.body)
-        log.info('Message :' + str(body))
-        msg_dict = json.loads(body)
-        log.info('JSON Message :' + str(msg_dict))
+        msg_dict = self.cast_msg(message.body)
+        log.info('Message :' + str(msg_dict))
         return msg_dict
 
 
