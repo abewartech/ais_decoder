@@ -11,6 +11,7 @@ import time
 import argparse
 import logging 
 import os
+import traceback
 
 from kombu import Connection, Exchange, Queue, binding
 
@@ -47,18 +48,15 @@ def do_work():
 
 def main(args):
     '''
-    Receive encoded AIS messages from RabbitMQ, decode them, and 
-    republish them with a different routing key
+    Setup logging, and args, then "do_work"
     '''
     logging.basicConfig(
         stream=sys.stdout,
         format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-        #level= log.debug)
         level=getattr(logging, args.loglevel))
 
     log.setLevel(getattr(logging, args.loglevel))
-    log.info('ARGS: {0}'.format(ARGS))
-    cfg_object = lib.funcs.read_env_vars()
+    log.info('ARGS: {0}'.format(ARGS)) 
     do_work()
     log.warning('Script Ended...') 
 
@@ -83,5 +81,6 @@ if __name__ == "__main__":
         # os._exit(0)
     except Exception as error:
         log.error('Other exception. Exiting with code 1...')
+        log.error(traceback.format_exc())
         log.error(error)
         # os._exit(1)
