@@ -180,7 +180,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
     def get_consumers(self, Consumer, channel):
         return [Consumer(queues=self.queue,
-                        on_message=self.on_request,
+                        on_message=self.on_message,
                         accept={'application/json'},
                         prefetch_count=1)]
 
