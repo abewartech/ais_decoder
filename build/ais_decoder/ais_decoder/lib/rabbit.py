@@ -42,9 +42,10 @@ class Rabbit_Consumer(ConsumerMixin):
                                                             os.getenv('SRC_RABBIT_MSG_PORT'))
         log.debug('Source Rabbit is at {0}'.format(self.rabbit_url))
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
+        self.conn = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
         self.create_test_queue()
-        self.conn = Connection(self.rabbit_url) #This connection is only used for the dummy queue... 
+        
         self.message_handler = message_handler
         log.debug('Consumer init complete')  
         
