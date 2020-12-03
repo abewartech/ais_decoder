@@ -33,8 +33,7 @@ class Rabbit_Consumer(ConsumerMixin):
 
         The message handler must accept kombu message object
         '''
-        log.info('Setting up RabbitMQ source interface...')
-        self.cfg = CFG 
+        log.info('Setting up RabbitMQ source interface...') 
 
         # Key to consume from:
         self.rabbit_url = "amqp://{0}:{1}@{2}:{3}/".format(os.getenv('SRC_RABBITMQ_DEFAULT_USER'),
@@ -42,7 +41,7 @@ class Rabbit_Consumer(ConsumerMixin):
                                                             os.getenv('SRC_RABBIT_HOST'),
                                                             os.getenv('SRC_RABBIT_MSG_PORT'))
         log.debug('Source Rabbit is at {0}'.format(self.rabbit_url))
-        self.topic_exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
+        self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
         self.conn = Connection(self.rabbit_url) 
 
         log.debug('Creating Source Test Queue')  
@@ -67,15 +66,16 @@ class Rabbit_Consumer(ConsumerMixin):
     def bind_to_keys(self):
         # takes the list of routing keys in the config file
         # and create a queue bound to them.
+        topic_binds = []
         keys = json.loads(os.getenv('SRC_KEYS'))
         for key in keys:
             log.info('Building queue for topic: %s',key)
             # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
-            topic_bind = binding(exchange, routing_key=key)
+            topic_bind = binding(self.exchange, routing_key=key)
             topic_binds.append(topic_bind)
         queue_name = os.getenv('INSERT_QUEUE')
         self.queues = Queue(name=queue_name,
-                        exchange=exchange,
+                        exchange=self.exchange,
                         bindings=topic_binds,
                         max_length = 10000000)
 
@@ -92,7 +92,7 @@ class Rabbit_Consumer(ConsumerMixin):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
         test_q_name = "AAA-{0}-test-consume".format(self.cfg['project_name'])
         queue = Queue(name=test_q_name, 
-                        exchange=self.topic_exchange,
+                        exchange=self.exchange,
                         max_length = 1000, 
                         routing_key=os.getenv('PRODUCE_KEY'))
         queue.maybe_bind(self.conn)
