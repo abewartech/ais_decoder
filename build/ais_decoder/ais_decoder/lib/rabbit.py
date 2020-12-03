@@ -253,6 +253,6 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
                         exchange=self.exchange,
                         max_length = 1000, 
                         routing_key=os.getenv('PRODUCE_KEY'))
-        queue.maybe_bind(self.conn)
+        queue.maybe_bind(self.connection)
         queue.declare()
         return
