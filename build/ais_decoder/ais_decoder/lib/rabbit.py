@@ -190,29 +190,10 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
     def message_processor(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
-        msg_dict = self.cast_msg(message.body)
+        msg_dict = json.loads(message.body.decode('utf-8'))
         log.info('Message :' + str(msg_dict))
         return msg_dict
-
-
-    def cast_msg(self,body):
-        if type(body) is str:
-            json_body = [json.loads(body)]
-        elif type(body) is dict:
-            json_body = [body]
-        elif type(body) is list:
-            json_body = body
-        elif body is None:
-            json_body = [None]
-            return
-        else:
-            log.warning('Unknown message type: %s > %s', type(body), body)
-
-        assert(type(json_body) is list)
-
-        return json_body
-
-
+ 
 
     def on_message(self, message):
         log.info('Msg type %s received: %s',type(message.body),message.body)
