@@ -75,12 +75,12 @@ class Rabbit_Consumer(ConsumerMixin):
             topic_bind = binding(self.exchange, routing_key=key)
             topic_binds.append(topic_bind)
         queue_name = os.getenv('INSERT_QUEUE')
-        self.queues = Queue(name=queue_name,
+        self.queue = Queue(name=queue_name,
                         exchange=self.exchange,
                         bindings=topic_binds,
                         max_length = 10000000)
 
-        log.info('Source queues: %s',self.queues)
+        log.info('Source queues: %s',self.queue)
         return
 
     def errback(self, exc, interval):
