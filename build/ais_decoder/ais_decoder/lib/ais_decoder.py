@@ -140,7 +140,6 @@ class AIS_Decoder():
                 log.warning('Unrecognized message: '+ str(msg))
 
             decoded_line['routing_key'] = os.getenv('routing_key')
-            decoded_line['event_time'] = datetime.datetime.fromtimestamp(int(parsed_line.get('event_time'))).isoformat()
             log.debug('Decoded :' + str(decoded_line))
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(rabbit_msg))
