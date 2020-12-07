@@ -120,7 +120,7 @@ class AIS_Decoder():
         "multiline": false, 
         "message": "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"}
         '''
-        log.info('Parsing MSG: '+ str(rabbit_msg.body))
+        log.debug('Parsing MSG: '+ str(rabbit_msg.body))
         udm_dict = json.loads(rabbit_msg.body)
         try:
             multimsg = udm_dict.get('multiline')
@@ -132,12 +132,12 @@ class AIS_Decoder():
                 decoded_line = self.single_decode(parsed_line) 
             elif multimsg == False:
                 #The rare multiline message. Already grouped by AIS-i-mov
-                msg1, msg2 = message
-                parse1 = parse_decode(msg1)
+                msg, msg2 = message
+                parse1 = parse_decode(msg)
                 parse2 = parse_decode(msg2)
                 decoded_line = multi_decode(parse1, parse2)
             else:
-                log.warning('Unrecognized message: '+ str(msg))
+                log.warning('Unrecognized message: '+ str(udm_dict))
 
             decoded_line['routing_key'] = os.getenv('routing_key')
             log.debug('Decoded :' + str(decoded_line))
