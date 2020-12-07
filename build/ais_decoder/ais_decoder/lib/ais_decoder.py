@@ -124,7 +124,8 @@ class AIS_Decoder():
         udm_dict = json.loads(rabbit_msg.body)
         try:
             multimsg = udm_dict.get('multiline')
-            decoder = self.ais_format.reset()
+            # decoder = self.ais_format.reset()
+            decoder = Basic_AIS()
             if multimsg == False:
                 #Single Line Messages, the bulk of 'em
                 parsed_line = decoder.return_dict(udm_dict['message'])              
@@ -142,7 +143,7 @@ class AIS_Decoder():
             decoded_line['event_time'] = datetime.datetime.fromtimestamp(int(parsed_line.get('event_time'))).isoformat()
             log.debug('Decoded :' + str(decoded_line))
         except:
-            log.warning('Problem with parsing and decoding line: {0}'.format(msg))
+            log.warning('Problem with parsing and decoding line: {0}'.format(rabbit_msg))
             log.warning(traceback.format_exc())
         
 class Basic_AIS():
@@ -171,7 +172,7 @@ class Basic_AIS():
         log.debug('Parsing plain AIS message: ' + str(ais_msg))
         self.talker, self.frag_count, self.frag_num, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
 
-    def return_dict(self,ais_msg): 
+    def return_dict(self,ais_msg):
         self.parse(ais_msg) 
         parsed_dict = {'header':self.header,
                     'footer':self.footer,
