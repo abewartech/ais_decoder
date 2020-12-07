@@ -12,6 +12,7 @@ import os
 import subprocess
 import json
 import datetime
+import traceback
 import pytz
  
 from kombu import Connection, Exchange, Producer, Queue, Consumer, binding
@@ -180,7 +181,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
     def message_processor(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
-        msg_dict = json.loads(message.body.decode('utf-8'))
+        msg_dict = json.loads(message.body)
         log.info('Message :' + str(msg_dict))
         return msg_dict
  
@@ -199,6 +200,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
         except Exception as err:
                 log.error('Error in message processor: {0}'.format(err))
+                log.error(traceback.format_exc())
 
 
     def bind_to_keys(self):
