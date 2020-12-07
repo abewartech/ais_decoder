@@ -104,61 +104,51 @@ class Rabbit_Consumer(ConsumerMixin):
             Consumer(self.queue, callbacks=[self.on_message], accept=['json']),
         ]
  
-# class Rabbit_Producer(object):
-#     '''
-#     Take each message and do something with it.
-#     Send the decoded messages to a rabbit broker
-#     '''
-#     def __init__(self, CFG):
-#         '''
-#         setup all the goodies
-#         '''
-#         log.debug('Setting up RabbitMQ sink interface...')
-#         self.cfg = CFG 
 
-#         user = CFG.get('snk_rabbit_user')
-#         password = CFG.get('snk_rabbit_pass')
-#         host = CFG.get('snk_rabbit_host')
-#         port = CFG.get('snk_rabbit_port')
-#         sink_topic_exchange_name= CFG.get('snk_rabbit_exch')
+class Rabbit_Producer(object):
+    '''
+    Take each message and do something with it.
+    Send the decoded messages to a rabbit broker
+    '''
+    def __init__(self):
+        log.info('Setting up RabbitMQ sink interface...') 
+        # Key to consume from:
+        self.rabbit_url = "amqp://{0}:{1}@{2}:{3}/".format(os.getenv('SNK_RABBITMQ_DEFAULT_USER'),
+                                                            os.getenv('SNK_RABBITMQ_DEFAULT_PASS'),
+                                                            os.getenv('SNK_RABBIT_HOST'),
+                                                            os.getenv('SNK_RABBIT_MSG_PORT'))
+        log.info('Source/Sink Rabbit is at {0}'.format(self.rabbit_url))
+        self.exchange = Exchange(os.getenv('SNK_RABBIT_EXCHANGE'), type="topic")
+        self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
  
-#         # Key to consume from:
-#         self.rabbit_url = "amqp://{0}:{1}@{2}:{3}/".format(user, password, host, port)
-#         log.debug('Sink Rabbit is at {0}'.format(self.rabbit_url))
-#         self.sink_topic_exchange = Exchange(sink_topic_exchange_name, type="topic")
-#         self.conn = Connection(self.rabbit_url)
-#         self.sink = Producer(exchange=self.sink_topic_exchange,
-#                               channel=self.conn,
-#                               serializer ='json')
-#         log.info('Rabbit Wrapper initialised.')
-#         log.info('Creating Sink Test Queue')
-#         self.create_test_queue()
-#         log.info('Done')
+        self.sink = Producer(exchange=self.exchange,
+                              channel=self.connection,
+                              serializer ='json' )
 
-#     def errback(self, exc, interval):
-#         log.warning('Produce error: %r', exc)
-#         log.warning('Retry in %s +1  seconds.', interval)
-#         time.sleep(float(interval)+1)
+        log.info('Producer init complete')  
+ 
 
-#     def produce_msg(self, msg_dict):
-#         '''
-#         send the info to all the right places
-#         '''
-#         payload = msg_dict
-#         payload_routing_key = msg_dict['routing_key']
-#         producer = self.conn.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
-#         producer(payload, routing_key=payload_routing_key)
-#         log.debug(' -Sent to Rabbit exchange: %s >> %s',self.sink_topic_exchange, payload_routing_key)
+    # def get_consumers(self, Consumer, channel):
+    #     return [Consumer(queues=self.queue,
+    #                     on_message=self.on_message,
+    #                     accept={'application/json'},
+    #                     prefetch_count=1)]
 
-#     def create_test_queue(self):
-#         test_q_name = "AAA-{0}-test-produce".format(self.cfg['project_name'])
-#         queue = Queue(name=test_q_name, 
-#                       exchange=self.sink_topic_exchange,
-#                       max_length = 1000, 
-#                       routing_key=os.getenv('SOURCE_RKEY'))
-#         queue.maybe_bind(self.conn)
-#         queue.declare()
-#         return
+    def produce(self, message):
+        # This function is meant to be overloaded to provide some kind of functionality
+        try:
+            log.debug('Sending message to RMQ: ' + str(message))
+            producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
+            routing_key = message['routing_key']
+            producer(message, routing_key=routing_key)
+        except:
+            log.warning('Failed to send msg to rabbitmq')
+  
+    def errback(self, exc, interval):
+        log.warning('Consumer error: %r', exc)
+        log.warning('Retry in %s +1  seconds.', interval)
+        time.sleep(float(interval)+1)
+        return
 
 
 class Rabbit_ConsumerProducer(ConsumerProducerMixin):
@@ -219,15 +209,16 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         keys = json.loads(os.getenv('SRC_KEYS'))
         for key in keys:
             log.info('    -Key: %s',key)
-            # NOTE: don't declare queue name. It'll get auto generated and expire after 600 seconds of inactivity
             topic_bind = binding(self.exchange, routing_key=key)
             topic_binds.append(topic_bind)
+        self.source_keys = topic_binds      
         queue_name = os.getenv('SRC_QUEUE')
         self.queue = Queue(name=queue_name,
                         exchange=self.exchange,
-                        bindings=topic_binds,
+                        bindings=self.source_keys,
                         max_length = 10000000)
-
+        self.queue.maybe_bind(self.connection)
+        self.queue.declare()
         log.info('Source queues: %s',self.queue)
         return
 
@@ -244,7 +235,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
                         max_length = 100, 
-                        routing_key=os.getenv('SRC_KEYS'))
+                        routing_key=self.source_keys)
         queue.maybe_bind(self.connection)
         queue.declare()
 

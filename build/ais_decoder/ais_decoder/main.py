@@ -21,9 +21,6 @@ import lib.ais_decoder
 
 log = logging.getLogger('main')
 # log.setLevel('DEBUG')
- 
-     
- 
 def do_work():  
     '''
     Message worker: consume > decode > publish.

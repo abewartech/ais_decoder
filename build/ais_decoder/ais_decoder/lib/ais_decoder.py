@@ -13,6 +13,7 @@ import os
 import re
 import time
 import datetime
+import traceback
 
 import ais 
 import lib.funcs 
@@ -21,13 +22,14 @@ import lib.funcs
 log = logging.getLogger('main.file_streamer')
 # log.setLevel('DEBUG')
 
-class AIS_Worker(object):
-    def __init__(self, cfg_object):
-        '''
-        Setup all the Rabbit stuff and then init the AIS decoder
-        '''
-        self.cfg = cfg_object  
+log = logging.getLogger('main.ais_decode')
+# log.setLevel('DEBUG')
 
+
+class AIS_Decoder():
+    def __init__(self, ais_message_format):
+        self.ais_format = ais_message_format
+         
     def eta_from_multi(self, decoded_dict, event_time):
         # Turn the ETA items in Voyage reports into a datetime object
         try:
@@ -97,7 +99,7 @@ class AIS_Worker(object):
         log.debug('Decoding: {0}'.format(parsed_line))
         log.debug('Decoding: {0}, {1}'.format(parsed_line['payload'], int(parsed_line['padding'])))
         try:
-            decode_dict = ais.decode(parsed_line['payload'], int(parsed_line['padding']))
+            decode_dict = ais.decode(parsed_line['message'], int(parsed_line['padding']))
         except Exception as err:
             log.debug(err)
             try:
@@ -109,8 +111,76 @@ class AIS_Worker(object):
         log.debug('Decoding: {0}'.format(decode_dict))
         return decode_dict
 
-    def run(self):
+    def decode(self, udm_dict):
         '''
-        Reads the json messages from the rabbit queue
+        Take the message, parse it and decode it. return a decoded dict.
+        {"server_time": "2020-12-04T14:43:01.461071", 
+        "event_time": "", 
+        "routing_key": "sink.key.test", 
+        "multiline": false, 
+        "message": "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"}
         '''
-        pass
+        log.info('Parsing MSG: '+ str(udm_dict)) 
+        try:
+            multimsg = udm_dict.get('multiline')
+            if multimsg == False:
+                #Single Line Messages, the bulk of 'em
+                parsed_line = Basic_AIS(udm_dict['message']).return_dict()                
+                decoded_line = self.single_decode(parsed_line) 
+            elif multimsg == False:
+                #The rare multiline message. Already grouped by AIS-i-mov
+                msg1, msg2 = message
+                parse1 = parse_decode(msg1)
+                parse2 = parse_decode(msg2)
+                decoded_line = multi_decode(parse1, parse2)
+            else:
+                log.warning('Unrecognized message: '+ str(msg))
+
+            decoded_line['routing_key'] = os.getenv('routing_key')
+            decoded_line['event_time'] = datetime.datetime.fromtimestamp(int(parsed_line.get('event_time'))).isoformat()
+            log.debug(decoded_line)
+        except:
+            log.warning('Problem with parsing and decoding line: {0}'.format(msg))
+            log.warning(traceback.format_exc())
+        
+class Basic_AIS():
+    # The most basic AIS class
+    # This is for a AIS source that has no header/footers, and no other meta-data:
+    # "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"
+    def __init__(self, ais_msg):
+        self.header = None
+        self.footer = None
+        self.payload = None
+        self.event_time = None
+        self.server_time = None
+        self.talker = None
+        self.frag_count = None
+        self.frag_num = None
+        self.seq_id = None
+        self.radio_chan = None
+        self.payload = None
+        self.padding = None
+        self.checksum = None
+
+        self.parse(ais_msg)
+        self.parsed_dict = self.return_dict()
+
+    def parse(self, ais_msg):
+        log.debug('Parsing plain AIS message: ' + str(ais_msg))
+        self.talker, self.frag_count, self.frag_num, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
+
+    def return_dict(self): 
+        parsed_dict = {'header':self.header,
+                    'footer':self.footer,
+                    'payload':self.payload,
+                    'event_time':self.event_time,
+                    'server_time':self.server_time,
+                    'talker':self.talker,
+                    'frag_count':self.frag_count,
+                    'frag_num':self.frag_num,
+                    'seq_id':self.seq_id,
+                    'radio_chan':self.radio_chan,
+                    'payload':self.payload,
+                    'padding':self.padding,
+                    'checksum':self.checksum,}
+        return parsed_dict
