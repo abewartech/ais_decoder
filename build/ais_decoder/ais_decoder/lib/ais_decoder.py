@@ -129,14 +129,14 @@ class AIS_Decoder():
                 #Single Line Messages, the bulk of 'em
                 parsed_line = decoder.return_dict(udm_dict['message'])              
                 decoded_line = self.single_decode(parsed_line) 
-                decoded_line['routing_key'] = os.getenv('routing_key')
+                decoded_line['routing_key'] = os.getenv('PRODUCE_KEY')
             elif multimsg == True:
                 #The rare multiline message. Already grouped by AIS-i-mov
                 msg, msg2 = udm_dict['message']
                 parse1 = decoder.return_dict(msg)
                 parse2 = decoder.return_dict(msg2)
-                decoded_line = multi_decode(parse1, parse2)
-                decoded_line['routing_key'] = os.getenv('routing_key')
+                decoded_line = self.multi_decode(parse1, parse2)
+                decoded_line['routing_key'] = os.getenv('PRODUCE_KEY')
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
                 decoded_line =udm_dict
