@@ -123,9 +123,7 @@ class AIS_Decoder():
         log.debug('Parsing MSG: '+ str(rabbit_msg.body))
         udm_dict = json.loads(rabbit_msg.body)
         try:
-            multimsg = udm_dict.get('multiline')
-            log.warning(multimsg)
-            log.warning(multimsg.__class__)
+            multimsg = udm_dict.get('multiline') 
             decoder = Basic_AIS()
             if multimsg == False:
                 #Single Line Messages, the bulk of 'em
@@ -142,6 +140,7 @@ class AIS_Decoder():
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
                 decoded_line =udm_dict
+                time.sleep(1)
             log.debug('Decoded :' + str(decoded_line))
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(rabbit_msg))
