@@ -133,8 +133,8 @@ class AIS_Decoder():
             elif multimsg == True:
                 #The rare multiline message. Already grouped by AIS-i-mov
                 msg, msg2 = udm_dict['message']
-                parse1 = parse_decode(msg)
-                parse2 = parse_decode(msg2)
+                parse1 = decoder.return_dict(msg)
+                parse2 = decoder.return_dict(msg2)
                 decoded_line = multi_decode(parse1, parse2)
                 decoded_line['routing_key'] = os.getenv('routing_key')
             else:
