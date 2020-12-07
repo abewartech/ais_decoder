@@ -170,7 +170,7 @@ class Basic_AIS():
 
     def parse(self, ais_msg):
         log.debug('Parsing plain AIS message: ' + str(ais_msg))
-        self.talker, self.frag_count, self.frag_num, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
+        self.talker, self.frag_count, self.frag_num, self.seq_id, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
 
     def return_dict(self,ais_msg):
         self.parse(ais_msg) 
