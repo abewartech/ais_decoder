@@ -61,7 +61,7 @@ class AIS_Decoder():
         return parsed_line
 
     def single_decode(self, parsed_line): 
-        decoded_line = ais_decode(parsed_line)
+        decoded_line = self.ais_decode(parsed_line)
 
         #Clean up Trailing @'s
         if 'callsign' in decoded_line: 
@@ -77,7 +77,7 @@ class AIS_Decoder():
         log.debug('Multiline')
         parsed_line['payload'] = parsed_line.get('payload') + next_line.get('payload')
         parsed_line['padding'] = next_line['padding']  
-        decoded_line = ais_decode(parsed_line) 
+        decoded_line = self.ais_decode(parsed_line) 
 
         #Clean up Trailing @'s
         if 'callsign' in decoded_line: 
@@ -89,7 +89,7 @@ class AIS_Decoder():
 
         # Turn eta Columns into datetime. 
         if 'eta_month' in decoded_line:
-            decoded_line['eta'] = eta_from_multi(decoded_line, parsed_line['event_time'])
+            decoded_line['eta'] = self.eta_from_multi(decoded_line, parsed_line['event_time'])
 
         log.debug('Line Decoded: {0}'.format(decoded_line))
         return decoded_line
@@ -122,9 +122,10 @@ class AIS_Decoder():
         log.info('Parsing MSG: '+ str(udm_dict)) 
         try:
             multimsg = udm_dict.get('multiline')
+            decoder = self.ais_format.reset()
             if multimsg == False:
                 #Single Line Messages, the bulk of 'em
-                parsed_line = Basic_AIS(udm_dict['message']).return_dict()                
+                parsed_line = decoder.return_dict(udm_dict['message'])              
                 decoded_line = self.single_decode(parsed_line) 
             elif multimsg == False:
                 #The rare multiline message. Already grouped by AIS-i-mov
@@ -146,7 +147,10 @@ class Basic_AIS():
     # The most basic AIS class
     # This is for a AIS source that has no header/footers, and no other meta-data:
     # "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"
-    def __init__(self, ais_msg):
+    def __init__(self):
+        self.reset()
+    
+    def reset(self):
         self.header = None
         self.footer = None
         self.payload = None
@@ -161,14 +165,12 @@ class Basic_AIS():
         self.padding = None
         self.checksum = None
 
-        self.parse(ais_msg)
-        self.parsed_dict = self.return_dict()
-
     def parse(self, ais_msg):
         log.debug('Parsing plain AIS message: ' + str(ais_msg))
         self.talker, self.frag_count, self.frag_num, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
 
-    def return_dict(self): 
+    def return_dict(self,ais_msg): 
+        self.parse(ais_msg) 
         parsed_dict = {'header':self.header,
                     'footer':self.footer,
                     'payload':self.payload,
