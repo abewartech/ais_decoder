@@ -110,7 +110,7 @@ class AIS_Decoder():
         log.debug('Decoding: {0}'.format(decode_dict))
         return decode_dict
 
-    def message_processor(self, udm_dict):
+    def message_processor(self, rabbit_msg):
         '''
         Take the message, parse it and decode it. return a decoded dict.
         {"server_time": "2020-12-04T14:43:01.461071", 
@@ -119,7 +119,8 @@ class AIS_Decoder():
         "multiline": false, 
         "message": "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"}
         '''
-        log.info('Parsing MSG: '+ str(udm_dict)) 
+        log.info('Parsing MSG: '+ str(rabbit_msg.body))
+        udm_dict = rabbit_msg.body
         try:
             multimsg = udm_dict.get('multiline')
             decoder = self.ais_format.reset()
