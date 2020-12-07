@@ -164,7 +164,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
         self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
-        self.create_test_queue()
+        # self.create_test_queue()
         self.sink = Producer(exchange=self.exchange,
                               channel=self.connection,
                               serializer ='json' )
@@ -231,6 +231,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
     def create_test_queue(self):
         # Create a dummy queue on the rabbitmq server. Useful for debugging
         log.info('Creating Source Test Queue')  
+ 
         test_q_name = "AAA-{0}-test-source".format(os.getenv('PROJECT_NAME'))
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
