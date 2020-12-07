@@ -130,16 +130,16 @@ class AIS_Decoder():
                 #Single Line Messages, the bulk of 'em
                 parsed_line = decoder.return_dict(udm_dict['message'])              
                 decoded_line = self.single_decode(parsed_line) 
+                decoded_line['routing_key'] = os.getenv('routing_key')
             elif multimsg == False:
                 #The rare multiline message. Already grouped by AIS-i-mov
-                msg, msg2 = message
+                msg, msg2 = udm_dict['message']
                 parse1 = parse_decode(msg)
                 parse2 = parse_decode(msg2)
                 decoded_line = multi_decode(parse1, parse2)
+                decoded_line['routing_key'] = os.getenv('routing_key')
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
-
-            decoded_line['routing_key'] = os.getenv('routing_key')
             log.debug('Decoded :' + str(decoded_line))
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(rabbit_msg))
