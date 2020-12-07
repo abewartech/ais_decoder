@@ -120,7 +120,7 @@ class AIS_Decoder():
         "message": "!ABVDM,1,1,,B,34SH0b0OiQ1D52cd=AJli3tb0000,0*44\r"}
         '''
         log.info('Parsing MSG: '+ str(rabbit_msg.body))
-        udm_dict = rabbit_msg.body
+        udm_dict = json.loads(rabbit_msg.body)
         try:
             multimsg = udm_dict.get('multiline')
             decoder = self.ais_format.reset()
