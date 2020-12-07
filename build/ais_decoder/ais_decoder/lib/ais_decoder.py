@@ -60,8 +60,7 @@ class AIS_Decoder():
         log.debug('Parsed: {0}'.format(parsed_line))
         return parsed_line
 
-    def single_decode(self, parsed_line):
-        log.debug('SingleLine')
+    def single_decode(self, parsed_line): 
         decoded_line = ais_decode(parsed_line)
 
         #Clean up Trailing @'s
@@ -111,7 +110,7 @@ class AIS_Decoder():
         log.debug('Decoding: {0}'.format(decode_dict))
         return decode_dict
 
-    def decode(self, udm_dict):
+    def message_processor(self, udm_dict):
         '''
         Take the message, parse it and decode it. return a decoded dict.
         {"server_time": "2020-12-04T14:43:01.461071", 
@@ -138,7 +137,7 @@ class AIS_Decoder():
 
             decoded_line['routing_key'] = os.getenv('routing_key')
             decoded_line['event_time'] = datetime.datetime.fromtimestamp(int(parsed_line.get('event_time'))).isoformat()
-            log.debug(decoded_line)
+            log.debug('Decoded :' + str(decoded_line))
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(msg))
             log.warning(traceback.format_exc())

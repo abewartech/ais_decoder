@@ -182,12 +182,12 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
     def message_processor(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
         msg_dict = json.loads(message.body)
-        log.info('Message :' + str(msg_dict))
+        log.debug('Dummy Message processor:' + str(msg_dict))
         return msg_dict
  
 
     def on_message(self, message):
-        log.info('Msg type %s received: %s',type(message.body),message.body)
+        log.debug('Msg type %s received: %s',type(message.body),message.body)
         if message.delivery_info['redelivered']:
             message.reject()
             return

@@ -28,7 +28,10 @@ def do_work():
     log.info('Getting ready to do work...')
 
     # This pulls/pushes messages from RMQ
-    rabbit_interface = lib.rabbit.Rabbit_ConsumerProducer()         
+    rabbit_interface = lib.rabbit.Rabbit_ConsumerProducer()
+    ais_message_format = lib.ais_decoder.Basic_AIS()
+    ais_worker = lib.ais_decoder.AIS_Decoder(ais_message_format)
+    rabbit_interface.message_processor =  ais_worker.message_processor
 
     # This decodes messages and is used to overload the default function in the Consumer/Producer
 
