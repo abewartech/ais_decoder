@@ -141,7 +141,7 @@ class AIS_Decoder():
                 log.warning('Unrecognized message: '+ str(udm_dict))
                 decoded_line =udm_dict
                 time.sleep(1)
-            log.debug('Decoded :' + str(decoded_line))
+            log.info('Decoded :' + str(decoded_line))
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(udm_dict))
             log.warning(traceback.format_exc())
@@ -169,7 +169,7 @@ class Basic_AIS():
         self.checksum = None
 
     def parse(self, ais_msg):
-        log.info('Parsing plain AIS message: ' + str(ais_msg))
+        log.debug('Parsing plain AIS message: ' + str(ais_msg))
         self.talker, self.frag_count, self.frag_num, self.seq_id, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
 
     def return_dict(self,ais_msg):
