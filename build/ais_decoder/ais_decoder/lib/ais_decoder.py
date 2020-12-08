@@ -137,7 +137,7 @@ class AIS_Decoder():
                 udm_dict['decoded_msg'] = decoded_line
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
-                udm_dict['decoded_msg'] = {}} 
+                udm_dict['decoded_msg'] = {}
             log.info('Decoded :' + str(udm_dict))
             time.sleep(10)
         except:
