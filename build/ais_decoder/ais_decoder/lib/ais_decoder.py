@@ -125,7 +125,8 @@ class AIS_Decoder():
             decoder = Basic_AIS()
             if multimsg == False:
                 #Single Line Messages, the bulk of 'em
-                parsed_line = decoder.return_dict(udm_dict['message'])              
+                parsed_line = decoder.return_dict(udm_dict['message']) 
+                udm_dict['parsed_msg'] = parsed_line
                 decoded_line = self.single_decode(parsed_line) 
                 udm_dict['decoded_msg'] = decoded_line
             elif multimsg == True:
@@ -133,7 +134,8 @@ class AIS_Decoder():
                 msg, msg2 = udm_dict['message']
                 parse1 = decoder.return_dict(msg)
                 parse2 = decoder.return_dict(msg2)
-                decoded_line = self.multi_decode(parse1, parse2)                
+                decoded_line = self.multi_decode(parse1, parse2)
+                udm_dict['parsed_msg'] = {'parsed_msg':parse1, 'parsed_msg_2':parse2}
                 udm_dict['decoded_msg'] = decoded_line
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
@@ -143,6 +145,8 @@ class AIS_Decoder():
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(udm_dict))
             log.warning(traceback.format_exc())
+        
+        return udm_dict
         
 class Basic_AIS():
     # The most basic AIS class
