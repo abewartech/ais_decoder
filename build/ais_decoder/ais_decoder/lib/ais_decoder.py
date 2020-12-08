@@ -139,9 +139,9 @@ class AIS_Decoder():
                 decoded_line['routing_key'] = os.getenv('PRODUCE_KEY')
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
-                decoded_line =udm_dict
-                time.sleep(1)
+                decoded_line =udm_dict                
             log.info('Decoded :' + str(decoded_line))
+            time.sleep(10)
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(udm_dict))
             log.warning(traceback.format_exc())
