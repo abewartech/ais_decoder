@@ -97,7 +97,6 @@ class AIS_Decoder():
 
     def ais_decode(self, parsed_line):
         log.debug('Decoding: {0}'.format(parsed_line))
-        log.debug('Decoding: {0}, {1}'.format(parsed_line['payload'], int(parsed_line['padding'])))
         try:
             decode_dict = ais.decode(parsed_line['message'], int(parsed_line['padding']))
         except Exception as err:
@@ -107,8 +106,7 @@ class AIS_Decoder():
                 decode_dict = ais.decode(parsed_line['payload'], padding) 
             except Exception as err:   
                 decode_dict = {}
-                log.debug(err)
-        log.debug('Decoding: {0}'.format(decode_dict))
+                log.debug(err) 
         return decode_dict
 
     def message_processor(self, rabbit_msg):
@@ -171,6 +169,12 @@ class Basic_AIS():
     def parse(self, ais_msg):
         log.debug('Parsing plain AIS message: ' + str(ais_msg))
         self.talker, self.frag_count, self.frag_num, self.seq_id, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
+        self.event_time = ais_msg.get('event_time')
+        self.server_time = ais_msg.get('server_time')
+        self.source_key = ais_msg.get('routing_key')
+        self.multiline = ais_msg.get('multiline')
+        self.message = ais_msg.get('message')
+        
 
     def return_dict(self,ais_msg):
         self.parse(ais_msg) 
@@ -186,5 +190,8 @@ class Basic_AIS():
                     'radio_chan':self.radio_chan,
                     'payload':self.payload,
                     'padding':self.padding,
-                    'checksum':self.checksum,}
+                    'checksum':self.checksum,
+                    'source_key':self.source_key,
+                    'multiline':self.multiline,
+                    'message':self.message}
         return parsed_dict
