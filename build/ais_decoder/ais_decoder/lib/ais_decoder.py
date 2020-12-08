@@ -98,7 +98,7 @@ class AIS_Decoder():
     def ais_decode(self, parsed_line):
         log.debug('Decoding: {0}'.format(parsed_line))
         try:
-            decode_dict = ais.decode(parsed_line['message'], int(parsed_line['padding']))
+            decode_dict = ais.decode(parsed_line['payload'], int(parsed_line['padding']))
         except Exception as err:
             log.debug(err)
             try:
