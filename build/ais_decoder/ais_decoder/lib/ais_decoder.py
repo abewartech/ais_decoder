@@ -127,18 +127,18 @@ class AIS_Decoder():
                 #Single Line Messages, the bulk of 'em
                 parsed_line = decoder.return_dict(udm_dict['message'])              
                 decoded_line = self.single_decode(parsed_line) 
-                decoded_line['routing_key'] = os.getenv('PRODUCE_KEY')
+                udm_dict['decoded_msg'] = decoded_line
             elif multimsg == True:
                 #The rare multiline message. Already grouped by AIS-i-mov
                 msg, msg2 = udm_dict['message']
                 parse1 = decoder.return_dict(msg)
                 parse2 = decoder.return_dict(msg2)
-                decoded_line = self.multi_decode(parse1, parse2)
-                decoded_line['routing_key'] = os.getenv('PRODUCE_KEY')
+                decoded_line = self.multi_decode(parse1, parse2)                
+                udm_dict['decoded_msg'] = decoded_line
             else:
                 log.warning('Unrecognized message: '+ str(udm_dict))
-                decoded_line =udm_dict                
-            log.info('Decoded :' + str(decoded_line))
+                udm_dict['decoded_msg'] = {}} 
+            log.info('Decoded :' + str(udm_dict))
             time.sleep(10)
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(udm_dict))
@@ -155,8 +155,7 @@ class Basic_AIS():
         self.header = None
         self.footer = None
         self.payload = None
-        self.event_time = None
-        self.server_time = None
+        self.event_time = None 
         self.talker = None
         self.frag_count = None
         self.frag_num = None
@@ -169,20 +168,12 @@ class Basic_AIS():
     def parse(self, ais_msg):
         log.debug('Parsing plain AIS message: ' + str(ais_msg))
         self.talker, self.frag_count, self.frag_num, self.seq_id, self.radio_chan, self.payload, self.padding, self.checksum = re.split(r',|\*', ais_msg) 
-        self.event_time = ais_msg.get('event_time')
-        self.server_time = ais_msg.get('server_time')
-        self.source_key = ais_msg.get('routing_key')
-        self.multiline = ais_msg.get('multiline')
-        self.message = ais_msg.get('message')
-        
 
     def return_dict(self,ais_msg):
         self.parse(ais_msg) 
         parsed_dict = {'header':self.header,
-                    'footer':self.footer,
-                    'payload':self.payload,
+                    'footer':self.footer, 
                     'event_time':self.event_time,
-                    'server_time':self.server_time,
                     'talker':self.talker,
                     'frag_count':self.frag_count,
                     'frag_num':self.frag_num,
@@ -190,8 +181,5 @@ class Basic_AIS():
                     'radio_chan':self.radio_chan,
                     'payload':self.payload,
                     'padding':self.padding,
-                    'checksum':self.checksum,
-                    'source_key':self.source_key,
-                    'multiline':self.multiline,
-                    'message':self.message}
+                    'checksum':self.checksum,}
         return parsed_dict
