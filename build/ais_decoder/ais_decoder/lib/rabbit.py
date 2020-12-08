@@ -194,11 +194,12 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         else:
             message.ack()
         try:          
-            result = self.message_processor(message)
-            log.info('Rabbit msg to produce: '+ str(result))
+            proc_msg = self.message_processor(message)
+            proc_msg['source_key'] = proc_msg['routing_key']
+            proc_msg['routing_key'] = os.getenv('PRODUCE_KEY')
             producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
-            producer(result, routing_key=os.getenv('PRODUCE_KEY'))
-            log.info('Produced?')
+            producer(proc_msg, routing_key=proc_msg['routing_key'])
+            # log.info('Produced?')
 
         except Exception as err:
                 log.error('Error in message processor: {0}'.format(err))
