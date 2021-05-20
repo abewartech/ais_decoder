@@ -125,13 +125,13 @@ class AIS_Decoder():
             decoder = Basic_AIS()
             if multimsg == False:
                 #Single Line Messages, the bulk of 'em
-                parsed_line = decoder.return_dict(udm_dict['message']) 
+                parsed_line = decoder.return_dict(udm_dict['ais']) 
                 udm_dict['parsed_msg'] = parsed_line
                 decoded_line = self.single_decode(parsed_line) 
                 udm_dict['decoded_msg'] = decoded_line
             elif multimsg == True:
                 #The rare multiline message. Already grouped by AIS-i-mov
-                msg, msg2 = udm_dict['message']
+                msg, msg2 = udm_dict['ais']
                 parse1 = decoder.return_dict(msg)
                 parse2 = decoder.return_dict(msg2)
                 decoded_line = self.multi_decode(parse1, parse2)
