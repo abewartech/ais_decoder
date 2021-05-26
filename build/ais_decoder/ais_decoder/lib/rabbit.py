@@ -195,8 +195,14 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             message.ack()
         try:          
             proc_msg = self.message_processor(message)
-            proc_msg['source_key'] = proc_msg['routing_key']
-            proc_msg['routing_key'] = os.getenv('PRODUCE_KEY')
+            proc_msg['source_key'] = proc_msg['routing_key'] 
+            
+            # Replace routing key with a new prepend.
+            source_key = proc_msg['routing_key']
+            sink_key = source_key.split('.')
+            sink_key[0] = os.getenv('PRODUCE_PREPEND')
+            proc_msg['routing_key'] = '.'.join(sink_key)
+            
             producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
             producer(proc_msg, routing_key=proc_msg['routing_key'])
             # log.info('Produced?')

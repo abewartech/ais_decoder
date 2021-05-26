@@ -75,9 +75,9 @@ if __name__ == "__main__":
         main(ARGS)
     except KeyboardInterrupt:
         log.warning('Keyboard Interrupt. Exiting...')
-        # os._exit(0)
+        os._exit(0)
     except Exception as error:
         log.error('Other exception. Exiting with code 1...')
         log.error(traceback.format_exc())
         log.error(error)
-        # os._exit(1)
+        os._exit(1)
