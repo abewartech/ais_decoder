@@ -163,10 +163,10 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         log.debug('Source/Sink Rabbit is at {0}'.format(self.rabbit_url))
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
 
-        self.xmin = os.getenv('XMIN',0.2)
-        self.xmax = os.getenv('XMAX',7.0)
-        self.ymin = os.getenv('YMIN',49.5)
-        self.ymax = os.getenv('YMAX  ',53.8)
+        self.xmin = float(os.getenv('XMIN',0.2))
+        self.xmax = float(os.getenv('XMAX',7.0))
+        self.ymin = float(os.getenv('YMIN',49.5))
+        self.ymax = float(os.getenv('YMAX  ',53.8))
 
         self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
@@ -218,8 +218,8 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             #  "event_time": "2022-08-31T08:04:17.472575", 
             # "routing_key": "ais.aishub.all"}' 
 
-            if (self.xmin < proc_msg.get('decoded_msg',{}).get('x',0) < self.xmin) and \
-                (self.ymin < proc_msg.get('decoded_msg',{}).get('y',0) < self.ymin):
+            if (self.xmin < float(proc_msg.get('decoded_msg',{}).get('x',0)) < self.xmin) and \
+                (self.ymin < float(proc_msg.get('decoded_msg',{}).get('y',0)) < self.ymin):
                 log.info('Producing message')
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
                 producer(proc_msg, routing_key=proc_msg['routing_key']) 
