@@ -208,8 +208,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
 
             if not ((self.xmin < float(proc_msg.get('decoded_msg',{}).get('x',0)) < self.xmin) and \
                 (self.ymin < float(proc_msg.get('decoded_msg',{}).get('y',0)) < self.ymin)):
-                log.info('Filtering message: Lon: {0}, Lat: {1}'.format(proc_msg.get('decoded_msg',{}).get('x',0)), 
-                                                                        float(proc_msg.get('decoded_msg',{}).get('y',0))
+                log.info('Filtering message: Lon: {0}, Lat: {1}').format(proc_msg.get('decoded_msg',{}).get('x',0), float(proc_msg.get('decoded_msg',{}).get('y',0)  ))
             else: 
                 log.info('Producing message')
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
