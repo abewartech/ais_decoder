@@ -206,23 +206,13 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             sink_key[0] = os.getenv('PRODUCE_PREPEND')
             proc_msg['routing_key'] = '.'.join(sink_key)
 
-            #{"id": 3, 
-            # "repeat_indicator": 0, 
-            # "mmsi": 211162570, 
-            # "nav_status": 1, 
-            # "sog": 0.10000000149011612, 
-            # "position_accuracy": 0, 
-            #### "x": 4.91896, "y": 52.379311666666666, 
-            # "cog": 192.10000610351562, 
-            # "true_heading": 511, 
-            #  "event_time": "2022-08-31T08:04:17.472575", 
-            # "routing_key": "ais.aishub.all"}' 
-
             if (self.xmin < float(proc_msg.get('decoded_msg',{}).get('x',0)) < self.xmin) and \
                 (self.ymin < float(proc_msg.get('decoded_msg',{}).get('y',0)) < self.ymin):
                 log.info('Producing message')
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
                 producer(proc_msg, routing_key=proc_msg['routing_key']) 
+            else: 
+                log.info('Filtering message')
 
         except Exception as err:
                 log.error('Error in message processor: {0}'.format(err))
