@@ -210,7 +210,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
                 (self.ymin <= float(proc_msg.get('decoded_msg',{}).get('y',self.ymin)) <= self.ymax)):
                 log.debug('Filtering message: Lon: {0}, Lat: {1}'.format(proc_msg.get('decoded_msg',{}).get('x',0), float(proc_msg.get('decoded_msg',{}).get('y',0)  )))
             else: 
-                log.debug('Producing message')
+                log.debug('Producing message: {0}'.format(proc_msg))
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
                 producer(proc_msg, routing_key=proc_msg['routing_key']) 
 
