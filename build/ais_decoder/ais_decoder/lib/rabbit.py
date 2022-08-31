@@ -137,7 +137,7 @@ class Rabbit_Producer(object):
     def produce(self, message):
         # This function is meant to be overloaded to provide some kind of functionality
         try:
-            log.debug('Sending message to RMQ: ' + str(message))
+            log.info('Sending message to RMQ: ' + str(message))
             producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
             routing_key = message['routing_key']
             producer(message, routing_key=routing_key)
@@ -163,15 +163,10 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         log.debug('Source/Sink Rabbit is at {0}'.format(self.rabbit_url))
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
 
-        # AISHUB_LIMIT_LAT1=49.5
-        # AISHUB_LIMIT_LON1=0.2
-        # AISHUB_LIMIT_LAT2=53.8
-        # AISHUB_LIMIT_LON2=7.0
-
-        self.xmin = os.getenv('xmin',0.2)
-        self.xmax = os.getenv('xmax',7.0)
-        self.ymin = os.getenv('ymin',49.5)
-        self.ymax = os.getenv('ymax',53.8)
+        self.xmin = os.getenv('XMIN',0.2)
+        self.xmax = os.getenv('XMAX',7.0)
+        self.ymin = os.getenv('YMIN',49.5)
+        self.ymax = os.getenv('YMAX  ',53.8)
 
         self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
@@ -179,9 +174,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         self.sink = Producer(exchange=self.exchange,
                               channel=self.connection,
                               serializer ='json' )
-
         log.info('ConsumerProducer init complete')  
- 
 
     def get_consumers(self, Consumer, channel):
         return [Consumer(queues=self.queue,
@@ -223,15 +216,11 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             # "cog": 192.10000610351562, 
             # "true_heading": 511, 
             #  "event_time": "2022-08-31T08:04:17.472575", 
-            # "routing_key": "ais.aishub.all"}'
-
-            self.xmin = os.getenv('xmin',0.2)
-            self.xmax = os.getenv('xmax',7.0)
-            self.ymin = os.getenv('ymin',49.5)
-            self.ymax = os.getenv('ymax',53.8)
+            # "routing_key": "ais.aishub.all"}' 
 
             if (self.xmin < proc_msg.get('decoded_msg',{}).get('x',0) < self.xmin) and \
                 (self.ymin < proc_msg.get('decoded_msg',{}).get('y',0) < self.ymin):
+                log.info('Producing message')
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
                 producer(proc_msg, routing_key=proc_msg['routing_key']) 
 
