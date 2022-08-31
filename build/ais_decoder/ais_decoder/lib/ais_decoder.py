@@ -144,8 +144,6 @@ class AIS_Decoder():
         except:
             log.warning('Problem with parsing and decoding line: {0}'.format(udm_dict))
             log.warning(traceback.format_exc())
-        
-        
         return udm_dict
         
 class Basic_AIS():

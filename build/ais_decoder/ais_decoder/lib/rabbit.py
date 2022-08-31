@@ -128,7 +128,6 @@ class Rabbit_Producer(object):
 
         log.info('Producer init complete')  
  
-
     # def get_consumers(self, Consumer, channel):
     #     return [Consumer(queues=self.queue,
     #                     on_message=self.on_message,
@@ -163,6 +162,17 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
                                                             os.getenv('SRC_RABBIT_MSG_PORT'))
         log.debug('Source/Sink Rabbit is at {0}'.format(self.rabbit_url))
         self.exchange = Exchange(os.getenv('SRC_RABBIT_EXCHANGE'), type="topic")
+
+        # AISHUB_LIMIT_LAT1=49.5
+        # AISHUB_LIMIT_LON1=0.2
+        # AISHUB_LIMIT_LAT2=53.8
+        # AISHUB_LIMIT_LON2=7.0
+
+        self.xmin = os.getenv('xmin',0.2)
+        self.xmax = os.getenv('xmax',7.0)
+        self.ymin = os.getenv('ymin',49.5)
+        self.ymax = os.getenv('ymax',53.8)
+
         self.connection = Connection(self.rabbit_url) #This connection is only used for the dummy queue...
         self.bind_to_keys()
         # self.create_test_queue()
@@ -202,10 +212,28 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             sink_key = source_key.split('.')
             sink_key[0] = os.getenv('PRODUCE_PREPEND')
             proc_msg['routing_key'] = '.'.join(sink_key)
-            
-            producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
-            producer(proc_msg, routing_key=proc_msg['routing_key'])
-            # log.info('Produced?')
+
+            #{"id": 3, 
+            # "repeat_indicator": 0, 
+            # "mmsi": 211162570, 
+            # "nav_status": 1, 
+            # "sog": 0.10000000149011612, 
+            # "position_accuracy": 0, 
+            #### "x": 4.91896, "y": 52.379311666666666, 
+            # "cog": 192.10000610351562, 
+            # "true_heading": 511, 
+            #  "event_time": "2022-08-31T08:04:17.472575", 
+            # "routing_key": "ais.aishub.all"}'
+
+            self.xmin = os.getenv('xmin',0.2)
+            self.xmax = os.getenv('xmax',7.0)
+            self.ymin = os.getenv('ymin',49.5)
+            self.ymax = os.getenv('ymax',53.8)
+
+            if (self.xmin < proc_msg.get('decoded_msg',{}).get('x',0) < self.xmin) and \
+                (self.ymin < proc_msg.get('decoded_msg',{}).get('y',0) < self.ymin):
+                producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
+                producer(proc_msg, routing_key=proc_msg['routing_key']) 
 
         except Exception as err:
                 log.error('Error in message processor: {0}'.format(err))

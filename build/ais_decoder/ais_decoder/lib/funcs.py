@@ -17,7 +17,7 @@ import pytz
 from kombu import Connection, Exchange, Producer, Queue, Consumer, binding
 
 
-log = logging.getLogger('main.funcs') 
+log = logging.getLogger('main.lib.funcs') 
 
 def read_env_vars():
     '''

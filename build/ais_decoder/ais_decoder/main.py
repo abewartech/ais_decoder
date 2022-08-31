@@ -38,7 +38,7 @@ def do_work():
     time.sleep(2)
     with Connection(rabbit_interface.rabbit_url, heartbeat=20) as conn: 
         rabbit_interface.connection = conn
-        log.info('Waiting for incoming messges...')
+        log.info('Waiting for incoming messages...')
         rabbit_interface.run()  # calls dummy_handler.on_message(message)
   
     log.info('Worker shutdown...')
