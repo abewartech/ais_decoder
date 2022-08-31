@@ -206,11 +206,11 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             sink_key[0] = os.getenv('PRODUCE_PREPEND')
             proc_msg['routing_key'] = '.'.join(sink_key)
 
-            if not ((self.xmin < float(proc_msg.get('decoded_msg',{}).get('x',0)) < self.xmin) and \
-                (self.ymin < float(proc_msg.get('decoded_msg',{}).get('y',0)) < self.ymin)):
-                log.info('Filtering message: Lon: {0}, Lat: {1}'.format(proc_msg.get('decoded_msg',{}).get('x',0), float(proc_msg.get('decoded_msg',{}).get('y',0)  )))
+            if not ((self.xmin <= float(proc_msg.get('decoded_msg',{}).get('x',self.xmin)) <= self.xmax) and \
+                (self.ymin <= float(proc_msg.get('decoded_msg',{}).get('y',self.ymin)) <= self.ymax)):
+                log.debug('Filtering message: Lon: {0}, Lat: {1}'.format(proc_msg.get('decoded_msg',{}).get('x',0), float(proc_msg.get('decoded_msg',{}).get('y',0)  )))
             else: 
-                log.info('Producing message')
+                log.debug('Producing message')
                 producer = self.connection.ensure(self.sink, self.sink.publish, errback=self.errback, interval_start = 1.0)
                 producer(proc_msg, routing_key=proc_msg['routing_key']) 
 
