@@ -203,8 +203,10 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             # Replace routing key with a new prepend.
             source_key = proc_msg['routing_key']
             sink_key = source_key.split('.')
-            sink_key[0] = os.getenv('PRODUCE_PREPEND')
-            proc_msg['routing_key'] = '.'.join(sink_key)
+            sink_key = os.getenv('PRODUCE_KEY')
+            # sink_key[0] = os.getenv('PRODUCE_PREPEND')
+            # proc_msg['routing_key'] = '.'.join(sink_key)
+            proc_msg['routing_key'] = sink_key
 
             if not ((self.xmin <= float(proc_msg.get('decoded_msg',{}).get('x',self.xmin)) <= self.xmax) and \
                 (self.ymin <= float(proc_msg.get('decoded_msg',{}).get('y',self.ymin)) <= self.ymax)):
