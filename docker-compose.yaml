@@ -9,6 +9,12 @@ services:
       build:
         context: ./build/ais_decoder
         dockerfile: Dockerfile
+      deploy:
+        restart_policy:
+          condition: on-failure
+        resources:
+          limits: 
+            memory: 500M 
       env_file:
         - .env  #This both the docker-compose env file (to set ports names, image tags etc) and the internal container config (handles passwords, ports to connect to etc.)
       volumes:
