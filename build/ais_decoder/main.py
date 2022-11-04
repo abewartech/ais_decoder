@@ -36,10 +36,23 @@ def do_work():
     # This decodes messages and is used to overload the default function in the Consumer/Producer
 
     time.sleep(2)
-    with Connection(rabbit_interface.rabbit_url, heartbeat=20) as conn: 
-        rabbit_interface.connection = conn
-        log.info('Waiting for incoming messages...')
-        rabbit_interface.run()  # calls dummy_handler.on_message(message)
+    # ================
+    # https://www.fugue.co/blog/diagnosing-and-fixing-memory-leaks-in-python.html
+    import tracemalloc
+    tracemalloc.start(10)
+    try:
+        with Connection(rabbit_interface.rabbit_url, heartbeat=20) as conn: 
+            rabbit_interface.connection = conn
+            log.info('Waiting for incoming messages...')
+            rabbit_interface.run()  # calls dummy_handler.on_message(message)
+    except:
+        snapshot = tracemalloc.take_snapshot()    
+        top_stats = snapshot.statistics('lineno')
+
+        log.error(" ==== [ Top 10 ] ====")
+        for stat in top_stats[:10]:
+            log.error(stat)
+
   
     log.info('Worker shutdown...')
 
