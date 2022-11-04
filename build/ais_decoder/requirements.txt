@@ -1,0 +1,7 @@
+libais==0.17
+pytz
+kombu
+python_dateutil
+configparser
+celery
+amqp
