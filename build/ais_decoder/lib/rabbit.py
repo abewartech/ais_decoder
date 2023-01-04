@@ -203,7 +203,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
             # Replace routing key with a new prepend.
             source_key = proc_msg['routing_key']
             sink_key = source_key.split('.')
-            sink_key = os.getenv('PRODUCE_KEY')
+            sink_key = os.getenv('SNK_PRODUCE_KEY')
             # sink_key[0] = os.getenv('PRODUCE_PREPEND')
             # proc_msg['routing_key'] = '.'.join(sink_key)
             proc_msg['routing_key'] = sink_key
@@ -275,7 +275,7 @@ class Rabbit_ConsumerProducer(ConsumerProducerMixin):
         queue = Queue(name=test_q_name, 
                         exchange=self.exchange,
                         max_length = 100, 
-                        routing_key=os.getenv('PRODUCE_KEY'))
+                        routing_key=os.getenv('SNK_PRODUCE_KEY'))
         queue.maybe_bind(self.connection)
         queue.declare()
 

@@ -38,8 +38,8 @@ def read_env_vars():
     CFG['src_routing_exch'] = os.getenv('SRC_RABBIT_EXCHANGE')
     CFG['src_keys'] = os.getenv('SRC_KEYS')
     CFG['src_'] = os.getenv('SRC_QUEUE')
-    CFG['src_'] = os.getenv('QUEUE_MAX_LENGTH')
-    CFG['src_'] = os.getenv('ON_ERROR_DROP_MSGS')
+    CFG['src_'] = os.getenv('SRC_QUEUE_MAX_LENGTH')
+    CFG['src_'] = os.getenv('SRC_ON_ERROR_DROP_MSGS')
 
     #Sink
     CFG['snk_rabbit_host'] = os.getenv('SRC_RABBIT_HOST')
