@@ -7,7 +7,7 @@ services:
     # Reads a folder full of daily AIS logs, decodes them and feeds them onto a rabbitmq topic 
       hostname: ${PROJECT_NAME}_ais_decoder
       build:
-        context: ./build/ais_decoder
+        context: .
         dockerfile: Dockerfile
       deploy:
         restart_policy:
