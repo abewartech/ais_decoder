@@ -112,6 +112,10 @@ class AIS_Decoder:
         return decoded_line
 
     def ais_decode(self, parsed_line):
+        # This  is the function that justifies this service.
+        # Since the Ais-i-mov was refactor just adding this
+        #   would complete the decoding in the previous service
+        #   rendering this one obsolute.
         log.debug("Decoding: {0}".format(parsed_line))
         try:
             decode_dict = ais.decode(

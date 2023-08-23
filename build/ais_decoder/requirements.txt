@@ -7,8 +7,10 @@
 amqp==5.1.1
     # via kombu
 kombu==5.3.1
-    # via -r build/ais_decoder/requirements.in
+    # via rab-the-bit
 libais==0.17
+    # via -r build/ais_decoder/requirements.in
+rab-the-bit==0.0.2
     # via -r build/ais_decoder/requirements.in
 six==1.16.0
     # via libais
