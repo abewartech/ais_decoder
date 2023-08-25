@@ -160,11 +160,12 @@ class AIS_Decoder:
                     parsed_list.append(parsed_line)
 
                 
-                decoded_line = self.multi_decode(parsed_list[0], parsed_list[1])
-                if len(parsed_list)>2:
-                    for parsed_line in parsed_list[2:]:
-                        decoded_line = self.multi_decode(decoded_line, parsed_line)
+                if len(parsed_list)> 2:
+                    log.warn("TODO -- decoding of multiline messages > 3 not currently supported")
 
+                # for now we just keep the first two parts
+                decoded_line = self.multi_decode(parsed_list[0], parsed_list[1])
+                
                 udm_dict["parsed_msg"] = {f"parsed_msg{ '_'+str(ndx) if ndx > 0 else '' }": line for ndx, line in enumerate(parsed_list) } 
                 udm_dict["decoded_msg"] = decoded_line
             else:
