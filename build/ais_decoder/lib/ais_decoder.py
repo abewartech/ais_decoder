@@ -153,14 +153,19 @@ class AIS_Decoder:
                 udm_dict["decoded_msg"] = decoded_line
             elif multimsg is True:
                 # The rare multiline message. Already grouped by AIS-i-mov
-                msg, msg2 = udm_dict["ais"]
-                parse1 = decoder.return_dict(msg)
-                parse2 = decoder.return_dict(msg2)
-                decoded_line = self.multi_decode(parse1, parse2)
-                udm_dict["parsed_msg"] = {
-                    "parsed_msg": parse1,
-                    "parsed_msg_2": parse2,
-                }
+                udm_dict["parsed_msg"] = {}
+                parsed_list = []
+                for msg in udm_dict["ais"]:
+                    parsed_line = decoder.return_dict(msg)
+                    parsed_list.append(parsed_line)
+
+                
+                decoded_line = self.multi_decode(parsed_list[0], parsed_list[1])
+                if len(parsed_list)>2:
+                    for parsed_line in parsed_list[2:]:
+                        decoded_line = self.multi_decode(decoded_line, parsed_line)
+
+                udm_dict["parsed_msg"] = {f"parsed_msg{ '_'+str(ndx) if ndx > 0 else '' }": line for ndx, line in enumerate(parsed_list) } 
                 udm_dict["decoded_msg"] = decoded_line
             else:
                 log.warning("Unrecognized message: " + str(udm_dict))
