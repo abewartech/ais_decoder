@@ -1,4 +1,11 @@
-# AIS Decoder
+---
+# Hugo Key Value pairs 
+title: AIS Decoding
+comments: false
+weight: 30
+---
+<!-- 
+# AIS Decoder -->
 
 The goal of this container is to take parsed AIS messages from an AMQP message broker and provide decoded AIS messages to the same, or a different, AMQP broker. 
 
