@@ -41,7 +41,6 @@ Special decoding steps will need to be written to include any metadata in the de
  
 ## Routing Keys
 RabbitMQ uses routing keys to gather and distribute messages. The routing keys are strings seperated by periods. Each individual string can be replaced by wildcards so, for example, if you wanted a decoder that ingested all AIS data, regardless of source, the following routing key could be provided: "*.encoded_ais.*". This would pull in all streams that had a "encoded_ais" term in them.
-
 The general routing_key convention in the OpenAIS project is to include the provider of the data, go from most generic to most specific, and to label the data as either "encoded_ais" or "ais". The routing keys can be configured to be almost anything in the config file so not too much emphasis is put on this. A good routing key would be:
 
 \<class of data\>.\<source of data\>.\<sub type of data\>.\<sub-sub type of date\>
