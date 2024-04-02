@@ -40,14 +40,14 @@ class DockerRabbit_CP(RabbitConsumerProducer):
         self.exchange_to_consume = os.getenv("AISIMOV_DECODER_RABBIT_EXCHANGE")
 
         self.exchange_to_deliver = os.getenv("AISDECODER_RABBIT_EXCHANGE")
-        self.queue_to_deliver = os.getenv("AISDECODER_RABBIT_QUEUE")
+        # self.queue_to_deliver = os.getenv("AISDECODER_RABBIT_QUEUE")
 
         super().__init__(
             self.rabbit_url,
             exchange_to_consume=self.exchange_to_consume,
             queue_to_consume=self.queue_to_consume,
             exchange_to_deliver=self.exchange_to_deliver,
-            queue_to_deliver=self.queue_to_deliver,
+            # queue_to_deliver=self.queue_to_deliver,
             log=log,
             errback=errback,
         )
