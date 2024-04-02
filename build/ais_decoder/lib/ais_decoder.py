@@ -10,6 +10,7 @@ import json
 import logging
 import re
 import traceback
+import os
 
 import ais
 
@@ -159,7 +160,6 @@ class AIS_Decoder:
                     parsed_line = decoder.return_dict(msg)
                     parsed_list.append(parsed_line)
 
-                
                 if len(parsed_list)> 2:
                     log.warn("TODO -- decoding of multiline messages > 3 not currently supported")
 
@@ -171,6 +171,9 @@ class AIS_Decoder:
             else:
                 log.warning("Unrecognized message: " + str(udm_dict))
                 udm_dict["decoded_msg"] = {}
+
+            # Message Decoded. Change routing key:
+            udm_dict['routing_key'] = os.getenv('SNK_PRODUCE_KEY')
             log.debug("Decoded :" + str(udm_dict))
         except Exception as e:
             log.warning(
