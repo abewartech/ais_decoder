@@ -38,6 +38,7 @@ class DockerRabbit_CP(RabbitConsumerProducer):
         log.debug("Source/Sink Rabbit is at {0}".format(self.rabbit_url))
         self.queue_to_consume = os.getenv("AISIMOV_RABBIT_QUEUE")
         self.exchange_to_consume = os.getenv("AISIMOV_DECODER_RABBIT_EXCHANGE")
+        self.queue_args = {'routing_key': os.getenv("MOV_KEY")}
 
         self.exchange_to_deliver = os.getenv("AISDECODER_RABBIT_EXCHANGE")
         # self.queue_to_deliver = os.getenv("AISDECODER_RABBIT_QUEUE")
