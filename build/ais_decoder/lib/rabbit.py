@@ -36,11 +36,11 @@ class DockerRabbit_CP(RabbitConsumerProducer):
             f"@{RABBIT_HOST}:{RABBIT_MSG_PORT}/"
         )
         log.debug("Source/Sink Rabbit is at {0}".format(self.rabbit_url))
-        self.queue_to_consume = os.getenv("AISIMOV_RABBIT_QUEUE")
-        self.exchange_to_consume = os.getenv("AISIMOV_DECODER_RABBIT_EXCHANGE")
-        self.queue_args = {'routing_key': os.getenv("MOV_KEY")}
+        self.queue_to_consume = os.getenv("SRC_QUEUE")
+        self.exchange_to_consume = os.getenv("SRC_RABBIT_EXCHANGE")
+        self.queue_args = {'routing_key': os.getenv("SRC_KEYS")}
 
-        self.exchange_to_deliver = os.getenv("AISDECODER_RABBIT_EXCHANGE")
+        self.exchange_to_deliver = os.getenv("SNK_RABBIT_EXCHANGE")
         # self.queue_to_deliver = os.getenv("AISDECODER_RABBIT_QUEUE")
 
         super().__init__(
@@ -49,6 +49,7 @@ class DockerRabbit_CP(RabbitConsumerProducer):
             queue_to_consume=self.queue_to_consume,
             exchange_to_deliver=self.exchange_to_deliver,
             # queue_to_deliver=self.queue_to_deliver,
+            queue_args=self.queue_args,
             log=log,
             errback=errback,
         )
